@@ -159,9 +159,6 @@ class Team:
 
     def update_kills(self):
 
-        """
-        This method should update each hero when there is a team kill.
-        """
 
 class Armor:
     def __init__(self, name, defense):
@@ -173,20 +170,41 @@ class Armor:
         # return 5
 
 class Arena:
-    def __init__(self):
-        self.team_one = None
-        self.team_two = None
+    def __init__(self, team_one_name, team_two_name):
+        self.team_one = Team(team_one_name)
+        self.team_two = Team(team_two_name)
+
+    def hero_creation_input(y, x):
+        name = input("Name your hero: ")
+        ability = input("Hero's ability: ")
+        ability_strength = int(input("{} strength: ").format(ability))
+        weapon = input("Hero's weapon: ")
+        weapon_strength = int(input("{} strength: ").format(weapon))
+        armor = input("Hero's armor type: ")
+        armor_strength = int(input("{} strength: ").format(armor))
+        create_hero(y, x, name, ability, ability_strength, weapon, weapon_strength, armor, armor_strength)
+
+    def create_hero(y, x, name, ability, ability_strength, weapon, weapon_strength, armor, armor_strength):
+        self.y.add_hero(Hero(name))
+        self.y.heroes[x].add_ability(Ability(ability, ability_strength))
+        self.y.heroes[x].add_weapon(Weapon(weapon, weapon_strength))
+        self.y.heroes[x].add_armor(Armor(armor, armor_strength))
+
 
     def build_team_one(self):
-
-        """
-        This method should allow a user to build team one.
-        """
+        response = input("Do you have heroes you'd like to create for {}"? y/n).format(team_one_name).lower()
+        if response == "y":
+            hero_creation_input(team_one_name, x)
+        elif response == "n":
+            build_team_two()
 
     def build_team_two(self):
-        """
-        This method should allow user to build team two.
-        """
+        response = input("Do you have heroes you'd like to create for {}"? y/n).format(team_two_name).lower()
+        if response == "y":
+            hero_creation_input(team_two_name, x)
+        elif response == "n":
+            team_battle()
+
 
     def team_battle(self):
         """
@@ -195,18 +213,16 @@ class Arena:
         """
 
     def show_stats(self):
-        """
-        This method should print out the battle statistics
-        including each heroes kill/death ratio.
-        """
+        print("{} Stats: ".format(team_one_name) + team_one.stats())
+        print("{} Stats: ".format(team_two_name) + team_two.stats())
 
 # test code
-# if __name__ == "__main__":
-#     hero = Hero("Wonder Woman")
-#     print(hero.attack())
-#     ability = Ability("Divine Speed", 300)
-#     hero.add_ability(ability)
-#     print(hero.attack())
-#     new_ability = Ability("Super Human Strength", 800)
-#     hero.add_ability(new_ability)
-#     print(hero.attack())
+if __name__ == "__main__":
+    hero = Hero("Wonder Woman")
+    print(hero.attack())
+    ability = Ability("Divine Speed", 300)
+    hero.add_ability(ability)
+    print(hero.attack())
+    new_ability = Ability("Super Human Strength", 800)
+    hero.add_ability(new_ability)
+    print(hero.attack())
