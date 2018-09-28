@@ -47,7 +47,6 @@ class Hero:
     def add_kill(self, num_kills):
         self.kills += num_kills
 
-
 class Ability:
     def __init__(self, name, attack_strength):
         # if __name__ == "__main__":
@@ -74,6 +73,8 @@ class Team:
     def __init__(self, team_name):
         self.name = team_name
         self.heroes = list()
+
+        team_kills = 0
 
 
     def add_hero(self, Hero):
@@ -121,6 +122,8 @@ class Team:
         for x in self.heroes:
             x.add_kill(num_kills)
 
+        return num_kills
+
 
     def defend(self, damage_amt):
         team_defense = 0
@@ -133,7 +136,7 @@ class Team:
             return self.deal_damage(damage_amt - team_defense)
 
         for x in self.heroes:
-            team_deaths = x.self.deaths
+            team_deaths = x.deaths
 
         return team_deaths
 
@@ -154,11 +157,11 @@ class Team:
 
     def stats(self):
         for x in self.heroes:
-            print("HERO: {} KILLS: {} DEATHS: {}".format(self.name, self.kills, self.deaths))
+            print("HERO: {} KILLS: {} DEATHS: {}".format(x.name, x.kills, x.deaths))
 
 
     def update_kills(self):
-
+        self.team_kills += 1
 
 class Armor:
     def __init__(self, name, defense):
@@ -167,62 +170,91 @@ class Armor:
 
     def defend(self):
         return random.randint(0, self.defense)
-        # return 5
+
 
 class Arena:
-    def __init__(self, team_one_name, team_two_name):
-        self.team_one = Team(team_one_name)
-        self.team_two = Team(team_two_name)
+    def __init__(self):
+        self.team_one = None
+        self.team_two = None
+        self.size = 0
 
-    def hero_creation_input(y, x):
+    def hero_creation_input(self, team):
         name = input("Name your hero: ")
         ability = input("Hero's ability: ")
-        ability_strength = int(input("{} strength: ").format(ability))
+        ability_strength = int(input("{} strength: ".format(ability)))
         weapon = input("Hero's weapon: ")
-        weapon_strength = int(input("{} strength: ").format(weapon))
+        weapon_strength = int(input("{} strength: ".format(weapon)))
         armor = input("Hero's armor type: ")
-        armor_strength = int(input("{} strength: ").format(armor))
-        create_hero(y, x, name, ability, ability_strength, weapon, weapon_strength, armor, armor_strength)
+        armor_strength = int(input("{} strength: ".format(armor)))
 
-    def create_hero(y, x, name, ability, ability_strength, weapon, weapon_strength, armor, armor_strength):
-        self.y.add_hero(Hero(name))
-        self.y.heroes[x].add_ability(Ability(ability, ability_strength))
-        self.y.heroes[x].add_weapon(Weapon(weapon, weapon_strength))
-        self.y.heroes[x].add_armor(Armor(armor, armor_strength))
+        new_hero = Hero(name, 100)
+        new_hero.add_ability(Ability(ability, ability_strength))
+        new_hero.add_ability(Weapon(weapon, weapon_strength))
+        new_hero.add_armor(Armor(armor, armor_strength))
 
+        team.add_hero(new_hero)
 
     def build_team_one(self):
-        response = input("Do you have heroes you'd like to create for {}"? y/n).format(team_one_name).lower()
-        if response == "y":
-            hero_creation_input(team_one_name, x)
-        elif response == "n":
-            build_team_two()
+        team_one_name = input("Name your first team: ")
+        self.team_one = Team(team_one_name)
+        should_exit = False
+
+        while should_exit == False:
+            response = input("Do you have a hero you'd like to create for {}? y/n: ".format(team_one_name))
+            if response in ("y", "Y"):
+                self.hero_creation_input(self.team_one)
+            elif response in ("n", "N"):
+                should_exit = True
+                print(self.team_one.heroes)
+
 
     def build_team_two(self):
-        response = input("Do you have heroes you'd like to create for {}"? y/n).format(team_two_name).lower()
-        if response == "y":
-            hero_creation_input(team_two_name, x)
-        elif response == "n":
-            team_battle()
+        team_two_name = input("Name your second team: ")
+        self.team_two = Team(team_two_name)
+        should_exit = False
+
+        while should_exit == False:
+            response = input("Do you have a hero you'd like to create for {}? y/n: ".format(team_two_name))
+            if response in ("y", "Y"):
+                self.hero_creation_input(self.team_two)
+            elif response in ("n", "N"):
+                should_exit = True
 
 
     def team_battle(self):
-        """
-        This method should continue to battle teams until
-        one or both teams are dead.
-        """
+        team_one_dead_heroes = 0
+        team_two_dead_heroes = 0
+        while team_one_dead_heroes < 6 and team_two_dead_heroes < 6:
+            team_two_dead_heroes += self.team_one.attack(self.team_two)
+            team_one_dead_heroes += self.team_two.attack(self.team_one)
 
     def show_stats(self):
-        print("{} Stats: ".format(team_one_name) + team_one.stats())
-        print("{} Stats: ".format(team_two_name) + team_two.stats())
+        print("{} Stats: ".format(self.team_one.name))
+        self.team_one.stats()
+        print("{} Stats: ".format(self.team_two.name))
+        self.team_two.stats()
 
-# test code
 if __name__ == "__main__":
-    hero = Hero("Wonder Woman")
-    print(hero.attack())
-    ability = Ability("Divine Speed", 300)
-    hero.add_ability(ability)
-    print(hero.attack())
-    new_ability = Ability("Super Human Strength", 800)
-    hero.add_ability(new_ability)
-    print(hero.attack())
+    game_is_running = True
+
+    # Instantiate Game Arena
+    arena = Arena()
+
+    #Build Teams
+    arena.build_team_one()
+    arena.build_team_two()
+
+    while game_is_running:
+
+        arena.team_battle()
+        arena.show_stats()
+        play_again = input("Play Again? Y or N: ")
+
+        #Check for Player Input
+        if play_again.lower() == "n":
+            game_is_running = False
+
+        else:
+            #Revive heroes to play again
+            arena.team_one.revive_heroes()
+            arena.team_two.revive_heroes()
